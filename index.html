@@ -1052,7 +1052,7 @@
   // ============================================
   // PAYSTACK CONFIG — Replace with your real key
   // ============================================
-  const PAYSTACK_PUBLIC_KEY = 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+  const PAYSTACK_PUBLIC_KEY = 'pk_test_fa411c15bd044d9ec8c';
 
   // ============================================
   // SUPABASE INIT
@@ -1330,18 +1330,62 @@ function submitRegistration() {
 // ============================================
 // PRODUCT UPLOAD
 // ============================================
-function handleImageUpload(input) {
+let uploadedImageUrl = '';
+
+async function handleImageUpload(input) {
   const file = input.files[0];
   if (!file) return;
+
+  // Validate file
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Image too large. Max 5MB.');
+    return;
+  }
+
+  const preview = document.getElementById('img-preview');
+  const uploadStatus = document.getElementById('upload-status');
+
+  // Show local preview immediately
   const reader = new FileReader();
   reader.onload = function(e) {
-    const preview = document.getElementById('img-preview');
     preview.style.backgroundImage = "url(" + e.target.result + ")";
     preview.style.backgroundSize = 'cover';
     preview.style.backgroundPosition = 'center';
-    preview.innerHTML = '<div style="background:rgba(0,0,0,0.5);color:white;padding:0.3rem 0.6rem;border-radius:5px;font-size:0.75rem;">\u2713 ' + file.name + '</div>';
+    preview.innerHTML = '<div style="background:rgba(0,0,0,0.6);color:white;padding:0.3rem 0.7rem;border-radius:5px;font-size:0.75rem;display:flex;align-items:center;gap:0.3rem;"><span id=\'upload-status\'>⏳ Uploading...</span></div>';
   };
   reader.readAsDataURL(file);
+
+  try {
+    // Upload to Supabase Storage
+    const fileExt = file.name.split('.').pop();
+    const fileName = 'product_' + Date.now() + '_' + Math.random().toString(36).substr(2,9) + '.' + fileExt;
+
+    const { data, error } = await sb.storage
+      .from('product-images')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) {
+      console.error('Upload error:', error);
+      preview.innerHTML = '<div style="background:rgba(239,68,68,0.8);color:white;padding:0.3rem 0.7rem;border-radius:5px;font-size:0.75rem;">❌ Upload failed — using local preview</div>';
+      // Still keep local preview working
+      return;
+    }
+
+    // Get public URL
+    const { data: urlData } = sb.storage
+      .from('product-images')
+      .getPublicUrl(fileName);
+
+    uploadedImageUrl = urlData.publicUrl;
+    preview.innerHTML = '<div style="background:rgba(16,185,129,0.85);color:white;padding:0.3rem 0.7rem;border-radius:5px;font-size:0.75rem;">✅ Image uploaded!</div>';
+
+  } catch(err) {
+    console.error('Storage error:', err);
+    preview.innerHTML = '<div style="background:rgba(201,168,76,0.9);color:#0A1628;padding:0.3rem 0.7rem;border-radius:5px;font-size:0.75rem;">⚠️ Saved locally</div>';
+  }
 }
 
 function getCategoryIcon(cat) {
@@ -1388,6 +1432,7 @@ async function submitProduct() {
     currency: currency,
     category: category,
     description: desc,
+    image_url: uploadedImageUrl || null,
     is_active: true
   };
 
@@ -1413,9 +1458,11 @@ function resetProductForm() {
   document.getElementById('upload-success').style.display = 'none';
   ['prod-name','prod-price','prod-desc'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('prod-cat').value = '';
+  uploadedImageUrl = '';
   const preview = document.getElementById('img-preview');
   preview.style.backgroundImage = '';
-  preview.innerHTML = '<div style="text-align:center;"><div style="font-size:2rem;margin-bottom:0.5rem;">\ud83d\udcf8</div><div style="font-size:0.82rem;color:#8892A4;">Click to upload product image</div><div style="font-size:0.72rem;color:#8892A4;margin-top:0.2rem;">JPG, PNG up to 5MB</div></div>';
+  preview.style.backgroundSize = '';
+  preview.innerHTML = '<div style="text-align:center;"><div style="font-size:2rem;margin-bottom:0.5rem;">📸</div><div style="font-size:0.82rem;color:#8892A4;">Click to upload product image</div><div style="font-size:0.72rem;color:#8892A4;margin-top:0.2rem;">JPG, PNG, max 5MB</div></div>';
 }
 
 // Init dashboard on page load
@@ -2087,7 +2134,10 @@ function renderResults() {
   const stars = n => '★'.repeat(n) + '☆'.repeat(5-n);
   grid.innerHTML = filteredResults.map(p => `
     <div style="background:white;border-radius:10px;overflow:hidden;border:1px solid #E2E8F0;cursor:pointer;transition:all 0.25s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 25px rgba(0,0,0,0.1)';this.style.borderColor='#C9A84C'" onmouseout="this.style.transform='none';this.style.boxShadow='none';this.style.borderColor='#E2E8F0'">
-      <div style="background:linear-gradient(135deg,#0A1628,#1A3357);height:140px;display:flex;align-items:center;justify-content:center;font-size:3rem;" onclick="openCheckout(${p.id})">${p.icon}</div>
+      <div style="background:linear-gradient(135deg,#0A1628,#1A3357);height:140px;display:flex;align-items:center;justify-content:center;font-size:3rem;overflow:hidden;position:relative;" onclick="openCheckout(${p.id})">
+        ${p.image_url ? '<img src="'+p.image_url+'" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display='none'">' : ''}
+        <span style="position:relative;z-index:1;">${p.icon}</span>
+      </div>
       <div style="padding:0.9rem;">
         <div style="font-size:0.68rem;color:#8892A4;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:0.2rem;">${p.category}</div>
         <div style="font-size:0.86rem;font-weight:600;color:#0A1628;margin-bottom:0.3rem;line-height:1.3;">${p.name}</div>
