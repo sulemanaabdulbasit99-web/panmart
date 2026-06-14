@@ -1,0 +1,2131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PanMart — Africa's Global Marketplace</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0A1628;
+    --navy-mid: #112240;
+    --navy-light: #1A3357;
+    --gold: #C9A84C;
+    --gold-light: #E8C76A;
+    --white: #F8F9FA;
+    --gray: #8892A4;
+    --gray-light: #E2E8F0;
+    --green: #10B981;
+    --red: #EF4444;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--white);
+    color: var(--navy);
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    background: var(--navy);
+    padding: 0 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: -0.5px;
+  }
+
+  .nav-logo span { color: var(--gold); }
+
+  .nav-search {
+    flex: 1;
+    max-width: 480px;
+    margin: 0 2rem;
+    display: flex;
+    background: var(--navy-light);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .nav-search input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 0.6rem 1rem;
+    color: var(--white);
+    font-size: 0.9rem;
+    outline: none;
+  }
+
+  .nav-search input::placeholder { color: var(--gray); }
+
+  .nav-search button {
+    background: var(--gold);
+    border: none;
+    padding: 0 1rem;
+    color: var(--navy);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+  }
+
+  .nav-search button:hover { background: var(--gold-light); }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .nav-links a {
+    color: var(--gray);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--white); }
+
+  .btn-nav {
+    background: var(--gold);
+    color: var(--navy) !important;
+    padding: 0.45rem 1.1rem;
+    border-radius: 5px;
+    font-weight: 600 !important;
+    transition: background 0.2s !important;
+  }
+
+  .btn-nav:hover { background: var(--gold-light) !important; }
+
+  /* CATEGORY BAR */
+  .cat-bar {
+    background: var(--navy-mid);
+    padding: 0 5%;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .cat-bar::-webkit-scrollbar { display: none; }
+
+  .cat-item {
+    color: var(--gray);
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 0.7rem 1.2rem;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .cat-item:hover, .cat-item.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 50%, #0D2137 100%);
+    padding: 4rem 5%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    min-height: 420px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    background: rgba(201,168,76,0.15);
+    color: var(--gold);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 0.3rem 0.8rem;
+    border-radius: 3px;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(201,168,76,0.3);
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 span { color: var(--gold); }
+
+  .hero p {
+    color: var(--gray);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    max-width: 420px;
+    line-height: 1.7;
+  }
+
+  .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  .btn-primary {
+    background: var(--gold);
+    color: var(--navy);
+    border: none;
+    padding: 0.8rem 1.8rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 0.8rem 1.8rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
+  }
+
+  .stat-card .number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--gold);
+    display: block;
+  }
+
+  .stat-card .label {
+    font-size: 0.78rem;
+    color: var(--gray);
+    font-weight: 500;
+    margin-top: 0.2rem;
+  }
+
+  /* TRUST BAR */
+  .trust-bar {
+    background: var(--gold);
+    padding: 0.8rem 5%;
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  /* SECTION */
+  .section { padding: 3.5rem 5%; }
+  .section-alt { background: #F1F5F9; }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--navy);
+  }
+
+  .section-title span { color: var(--gold); }
+
+  .see-all {
+    font-size: 0.85rem;
+    color: var(--gold);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .see-all:hover { border-bottom-color: var(--gold); }
+
+  /* CATEGORY CARDS */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+  }
+
+  .cat-card {
+    background: var(--navy);
+    border-radius: 10px;
+    padding: 2rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(201,168,76,0.1);
+  }
+
+  .cat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 80px; height: 80px;
+    background: rgba(201,168,76,0.08);
+    border-radius: 50% 0 10px 0;
+    transition: all 0.3s;
+  }
+
+  .cat-card:hover { transform: translateY(-3px); border-color: rgba(201,168,76,0.4); box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
+  .cat-card:hover::after { width: 120px; height: 120px; }
+
+  .cat-icon { font-size: 2.2rem; margin-bottom: 1rem; display: block; }
+
+  .cat-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 0.3rem;
+  }
+
+  .cat-card p { font-size: 0.8rem; color: var(--gray); }
+
+  .cat-card .cat-count {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* PRODUCT GRID */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+  }
+
+  .product-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--gray-light);
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .product-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); border-color: var(--gold); }
+
+  .product-img {
+    background: linear-gradient(135deg, var(--navy-light), var(--navy));
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    position: relative;
+  }
+
+  .badge {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .badge.new { background: var(--green); color: white; }
+  .badge.hot { background: var(--red); color: white; }
+
+  .product-info { padding: 1rem; }
+
+  .product-category {
+    font-size: 0.7rem;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  .product-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .product-seller {
+    font-size: 0.75rem;
+    color: var(--gray);
+    margin-bottom: 0.8rem;
+  }
+
+  .product-seller span { color: var(--gold); font-weight: 600; }
+
+  .product-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .product-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .product-price .currency { font-size: 0.75rem; color: var(--gray); font-weight: 500; }
+
+  .stars { color: var(--gold); font-size: 0.75rem; }
+
+  .btn-add {
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 5px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-add:hover { background: var(--gold); color: var(--navy); }
+
+  /* SELLER BANNER */
+  .seller-banner {
+    background: linear-gradient(135deg, var(--navy) 0%, #0D2137 100%);
+    border-radius: 12px;
+    padding: 3rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    align-items: center;
+    border: 1px solid rgba(201,168,76,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .seller-banner::before {
+    content: '🌍';
+    position: absolute;
+    right: 200px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 8rem;
+    opacity: 0.05;
+  }
+
+  .seller-banner h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  .seller-banner h2 span { color: var(--gold); }
+  .seller-banner p { color: var(--gray); font-size: 0.95rem; max-width: 500px; }
+
+  .seller-perks {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .perk {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: var(--gray);
+  }
+
+  .perk-icon { color: var(--gold); }
+
+  /* FOOTER */
+  footer {
+    background: var(--navy);
+    color: var(--gray);
+    padding: 3rem 5% 1.5rem;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 1.5rem;
+  }
+
+  .footer-brand .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: 0.8rem;
+  }
+
+  .footer-brand .logo span { color: var(--gold); }
+  .footer-brand p { font-size: 0.83rem; line-height: 1.7; max-width: 240px; }
+
+  .footer-col h4 {
+    color: var(--white);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+  }
+
+  .footer-col a {
+    display: block;
+    color: var(--gray);
+    text-decoration: none;
+    font-size: 0.82rem;
+    margin-bottom: 0.5rem;
+    transition: color 0.2s;
+  }
+
+  .footer-col a:hover { color: var(--gold); }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+  }
+
+  .footer-bottom .countries {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .country-tag {
+    background: rgba(255,255,255,0.05);
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    font-size: 0.72rem;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; min-height: auto; }
+    .hero-stats { grid-template-columns: repeat(3,1fr); }
+    .cat-grid { grid-template-columns: 1fr 1fr; }
+    .product-grid { grid-template-columns: repeat(2,1fr); }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .seller-banner { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .nav-search { display: none; }
+    .hero h1 { font-size: 2rem; }
+    .cat-grid { grid-template-columns: 1fr; }
+    .product-grid { grid-template-columns: 1fr 1fr; }
+    .trust-bar { gap: 1rem; }
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Pan<span>Mart</span></div>
+  <div class="nav-search">
+    <input type="text" placeholder="Search products, services, sellers...">
+    <button onclick="goSearch()">Search</button>
+  </div>
+  <div class="nav-links">
+    <a onclick="showPage('login')" style="cursor:pointer;">Sign In</a>
+    <a onclick="showPage('register')" class="btn-nav" style="cursor:pointer;">Start Selling</a>
+  </div>
+</nav>
+
+<!-- CATEGORY BAR -->
+<div class="cat-bar">
+  <div class="cat-item active" onclick="showPage('search');setTimeout(()=>{runSearch('')},50)" style="cursor:pointer;">All Categories</div>
+  <div class="cat-item" onclick="showPage('search');setTimeout(()=>{document.getElementById('search-input').value='Fashion & Apparel';runSearch('fashion')},50)" style="cursor:pointer;">Fashion & Apparel</div>
+  <div class="cat-item" onclick="showPage('search');setTimeout(()=>{document.getElementById('search-input').value='Electronics & Tech';runSearch('electronics')},50)" style="cursor:pointer;">Electronics & Tech</div>
+  <div class="cat-item" onclick="showPage('search');setTimeout(()=>{document.getElementById('search-input').value='Digital Services';runSearch('digital')},50)" style="cursor:pointer;">Digital Services</div>
+  <div class="cat-item" onclick="showPage('search');setTimeout(()=>{document.getElementById('search-input').value='Food & Agriculture';runSearch('food')},50)" style="cursor:pointer;">Food & Agriculture</div>
+  <div class="cat-item" onclick="showPage('search');setTimeout(()=>{document.getElementById('search-input').value='Health & Beauty';runSearch('health')},50)" style="cursor:pointer;">Health & Beauty</div>
+  <div class="cat-item" onclick="showPage('search');setTimeout(()=>{document.getElementById('search-input').value='Home & Living';runSearch('home')},50)" style="cursor:pointer;">Home & Living</div>
+  <div class="cat-item" onclick="showPage('search');setTimeout(()=>{document.getElementById('search-input').value='Arts & Crafts';runSearch('arts')},50)" style="cursor:pointer;">Arts & Crafts</div>
+  <div class="cat-item" onclick="showPage('search');setTimeout(()=>{document.getElementById('search-input').value='Automotive';runSearch('automotive')},50)" style="cursor:pointer;">Automotive</div>
+</div>
+
+<div id="main-content">
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-tag">🌍 Pan-African Marketplace</div>
+    <h1>Africa's <span>Global</span> Trading Platform</h1>
+    <p>Buy and sell products and services across Africa and beyond. Connect with verified sellers from Ghana, Nigeria, Kenya, South Africa and 50+ countries.</p>
+    <div class="hero-btns">
+      <button class="btn-primary">Shop Now</button>
+      <button class="btn-outline" onclick="showPage('register')">Become a Seller</button>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-card">
+      <span class="number">2.4M+</span>
+      <span class="label">Active Buyers</span>
+    </div>
+    <div class="stat-card">
+      <span class="number">180K+</span>
+      <span class="label">Verified Sellers</span>
+    </div>
+    <div class="stat-card">
+      <span class="number">54</span>
+      <span class="label">African Nations</span>
+    </div>
+    <div class="stat-card">
+      <span class="number">$420M</span>
+      <span class="label">GMV Processed</span>
+    </div>
+    <div class="stat-card">
+      <span class="number">99.2%</span>
+      <span class="label">Buyer Protection</span>
+    </div>
+    <div class="stat-card">
+      <span class="number">4.8★</span>
+      <span class="label">Avg Seller Rating</span>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-item"><span>🔒</span> Secure Payments</div>
+  <div class="trust-item"><span>🚚</span> Pan-African Delivery</div>
+  <div class="trust-item"><span>✅</span> Verified Sellers</div>
+  <div class="trust-item"><span>↩️</span> Buyer Protection</div>
+  <div class="trust-item"><span>📞</span> 24/7 Support</div>
+</div>
+
+<!-- CATEGORIES -->
+<section class="section">
+  <div class="section-header">
+    <h2 class="section-title">Top <span>Categories</span></h2>
+    <a class="see-all">View All →</a>
+  </div>
+  <div class="cat-grid">
+    <div class="cat-card">
+      <span class="cat-icon">💻</span>
+      <h3>Electronics & Tech</h3>
+      <p>Laptops, phones, accessories and gadgets from verified tech sellers.</p>
+      <div class="cat-count">48,200+ Products</div>
+    </div>
+    <div class="cat-card">
+      <span class="cat-icon">👕</span>
+      <h3>Fashion & Streetwear</h3>
+      <p>African fashion, streetwear brands, traditional attire and accessories.</p>
+      <div class="cat-count">92,400+ Products</div>
+    </div>
+    <div class="cat-card">
+      <span class="cat-icon">🎨</span>
+      <h3>Digital Services</h3>
+      <p>Freelance work, design, development, trading tools and digital products.</p>
+      <div class="cat-count">31,800+ Services</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="section section-alt">
+  <div class="section-header">
+    <h2 class="section-title">Featured <span>Products</span></h2>
+    <a class="see-all">See All →</a>
+  </div>
+  <div class="product-grid">
+
+    <div class="product-card">
+      <div class="product-img">
+        💻
+        <div class="badge hot">HOT</div>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Electronics</div>
+        <div class="product-name">Tecno Spark 20 Pro — 256GB</div>
+        <div class="product-seller">By <span>TechHub Ghana</span></div>
+        <div class="product-footer">
+          <div>
+            <div class="product-price"><span class="currency">GHS </span>2,450</div>
+            <div class="stars">★★★★★ <span style="color:#8892A4">(312)</span></div>
+          </div>
+          <div style="display:flex;gap:0.4rem;"><button class="btn-add" onclick="addToCart(1)">+Cart</button><button class="btn-add" onclick="openCheckout(1)" style="background:#C9A84C;color:#0A1628;">Buy</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img">
+        👕
+        <div class="badge new">NEW</div>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Fashion</div>
+        <div class="product-name">STRVRR Classic Drop Shoulder Tee</div>
+        <div class="product-seller">By <span>STRVRR Official</span></div>
+        <div class="product-footer">
+          <div>
+            <div class="product-price"><span class="currency">GHS </span>180</div>
+            <div class="stars">★★★★★ <span style="color:#8892A4">(87)</span></div>
+          </div>
+          <div style="display:flex;gap:0.4rem;"><button class="btn-add" onclick="addToCart(2)">+Cart</button><button class="btn-add" onclick="openCheckout(2)" style="background:#C9A84C;color:#0A1628;">Buy</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img">
+        📊
+        <div class="badge" style="background:#7C3AED;color:white">PRO</div>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Digital Service</div>
+        <div class="product-name">Custom MT5 Expert Advisor — SMC Strategy</div>
+        <div class="product-seller">By <span>STRVRR Dev</span></div>
+        <div class="product-footer">
+          <div>
+            <div class="product-price"><span class="currency">USD </span>60</div>
+            <div class="stars">★★★★☆ <span style="color:#8892A4">(44)</span></div>
+          </div>
+          <div style="display:flex;gap:0.4rem;"><button class="btn-add" onclick="addToCart(3)">+Cart</button><button class="btn-add" onclick="openCheckout(3)" style="background:#C9A84C;color:#0A1628;">Buy</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img">
+        🎧
+        <div class="badge hot">HOT</div>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Electronics</div>
+        <div class="product-name">Sony WH-1000XM5 Wireless Headphones</div>
+        <div class="product-seller">By <span>AudioPro Lagos</span></div>
+        <div class="product-footer">
+          <div>
+            <div class="product-price"><span class="currency">NGN </span>189K</div>
+            <div class="stars">★★★★★ <span style="color:#8892A4">(208)</span></div>
+          </div>
+          <div style="display:flex;gap:0.4rem;"><button class="btn-add" onclick="addToCart(4)">+Cart</button><button class="btn-add" onclick="openCheckout(4)" style="background:#C9A84C;color:#0A1628;">Buy</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img">
+        👟
+        <div class="badge new">NEW</div>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Fashion</div>
+        <div class="product-name">Adidas Samba OG — Limited African Edition</div>
+        <div class="product-seller">By <span>KicksCulture SA</span></div>
+        <div class="product-footer">
+          <div>
+            <div class="product-price"><span class="currency">ZAR </span>2,800</div>
+            <div class="stars">★★★★★ <span style="color:#8892A4">(156)</span></div>
+          </div>
+          <div style="display:flex;gap:0.4rem;"><button class="btn-add" onclick="addToCart(5)">+Cart</button><button class="btn-add" onclick="openCheckout(5)" style="background:#C9A84C;color:#0A1628;">Buy</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img">
+        🖥️
+      </div>
+      <div class="product-info">
+        <div class="product-category">Digital Service</div>
+        <div class="product-name">Logo & Brand Identity Design Package</div>
+        <div class="product-seller">By <span>CreativeMind Kenya</span></div>
+        <div class="product-footer">
+          <div>
+            <div class="product-price"><span class="currency">USD </span>35</div>
+            <div class="stars">★★★★★ <span style="color:#8892A4">(291)</span></div>
+          </div>
+          <div style="display:flex;gap:0.4rem;"><button class="btn-add" onclick="addToCart(6)">+Cart</button><button class="btn-add" onclick="openCheckout(6)" style="background:#C9A84C;color:#0A1628;">Buy</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img">
+        📱
+        <div class="badge hot">HOT</div>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Electronics</div>
+        <div class="product-name">Samsung Galaxy Tab S9 FE — 128GB</div>
+        <div class="product-seller">By <span>GadgetWorld GH</span></div>
+        <div class="product-footer">
+          <div>
+            <div class="product-price"><span class="currency">GHS </span>3,200</div>
+            <div class="stars">★★★★☆ <span style="color:#8892A4">(73)</span></div>
+          </div>
+          <div style="display:flex;gap:0.4rem;"><button class="btn-add" onclick="addToCart(7)">+Cart</button><button class="btn-add" onclick="openCheckout(7)" style="background:#C9A84C;color:#0A1628;">Buy</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img">
+        🧵
+        <div class="badge new">NEW</div>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Fashion</div>
+        <div class="product-name">Kente Weave Bomber Jacket — Custom</div>
+        <div class="product-seller">By <span>AfriStyle Accra</span></div>
+        <div class="product-footer">
+          <div>
+            <div class="product-price"><span class="currency">GHS </span>650</div>
+            <div class="stars">★★★★★ <span style="color:#8892A4">(129)</span></div>
+          </div>
+          <div style="display:flex;gap:0.4rem;"><button class="btn-add" onclick="addToCart(8)">+Cart</button><button class="btn-add" onclick="openCheckout(8)" style="background:#C9A84C;color:#0A1628;">Buy</button></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SELL BANNER -->
+<section class="section">
+  <div class="seller-banner">
+    <div>
+      <h2>Grow Your Business <span>Across Africa</span></h2>
+      <p>Join 180,000+ verified sellers reaching buyers in 54 African nations and internationally. Zero listing fees for your first 3 months.</p>
+      <div class="seller-perks">
+        <div class="perk"><span class="perk-icon">✓</span> Free storefront setup</div>
+        <div class="perk"><span class="perk-icon">✓</span> Multi-currency payments</div>
+        <div class="perk"><span class="perk-icon">✓</span> Seller analytics dashboard</div>
+        <div class="perk"><span class="perk-icon">✓</span> Pan-African logistics</div>
+      </div>
+    </div>
+    <div>
+      <button class="btn-primary" onclick="showPage('register')" style="font-size:1rem; padding:1rem 2rem;">Open Your Store →</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo">Pan<span>Mart</span></div>
+      <p>Africa's trusted marketplace connecting buyers and sellers across the continent and beyond.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Marketplace</h4>
+      <a href="#">Browse Products</a>
+      <a href="#">Digital Services</a>
+      <a href="#">New Arrivals</a>
+      <a href="#">Top Sellers</a>
+      <a href="#">Deals</a>
+    </div>
+    <div class="footer-col">
+      <h4>Sellers</h4>
+      <a href="#">Start Selling</a>
+      <a href="#">Seller Dashboard</a>
+      <a href="#">Pricing & Fees</a>
+      <a href="#">Seller Support</a>
+      <a href="#">Verification</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#">About PanMart</a>
+      <a href="#">Careers</a>
+      <a href="#">Press</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 PanMart. All rights reserved.</span>
+    <div class="countries">
+      <span class="country-tag">🇬🇭 Ghana</span>
+      <span class="country-tag">🇳🇬 Nigeria</span>
+      <span class="country-tag">🇰🇪 Kenya</span>
+      <span class="country-tag">🇿🇦 South Africa</span>
+      <span class="country-tag">🇸🇳 Senegal</span>
+      <span class="country-tag">+49 more</span>
+    </div>
+  </div>
+</footer>
+
+<!-- CHECKOUT MODAL -->
+<div id="checkout-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:14px; width:90%; max-width:480px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+
+    <!-- Modal Header -->
+    <div style="background:#0A1628; padding:1.2rem 1.5rem; display:flex; justify-content:space-between; align-items:center;">
+      <div style="font-family:'Playfair Display',serif; font-size:1.2rem; color:white; font-weight:800;">Pan<span style="color:#C9A84C;">Mart</span> Checkout</div>
+      <button onclick="closeCheckout()" style="background:none; border:none; color:#8892A4; font-size:1.4rem; cursor:pointer;">✕</button>
+    </div>
+
+    <!-- Product Summary -->
+    <div style="padding:1.5rem; border-bottom:1px solid #E2E8F0;">
+      <div style="font-size:0.75rem; color:#8892A4; text-transform:uppercase; letter-spacing:1px; margin-bottom:0.8rem;">Order Summary</div>
+      <div style="display:flex; align-items:center; gap:1rem;">
+        <div id="modal-icon" style="font-size:2.5rem; background:#0A1628; width:60px; height:60px; border-radius:8px; display:flex; align-items:center; justify-content:center;"></div>
+        <div>
+          <div id="modal-name" style="font-weight:600; color:#0A1628; font-size:0.95rem;"></div>
+          <div id="modal-seller" style="font-size:0.8rem; color:#8892A4; margin-top:0.2rem;"></div>
+          <div id="modal-price" style="font-size:1.1rem; font-weight:700; color:#C9A84C; margin-top:0.3rem;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Email Input -->
+    <div style="padding:1.5rem; border-bottom:1px solid #E2E8F0;">
+      <div style="font-size:0.75rem; color:#8892A4; text-transform:uppercase; letter-spacing:1px; margin-bottom:0.8rem;">Your Details</div>
+      <input id="buyer-email" type="email" placeholder="Enter your email address"
+        style="width:100%; padding:0.75rem 1rem; border:1px solid #E2E8F0; border-radius:8px; font-size:0.9rem; outline:none; font-family:'Inter',sans-serif; transition:border 0.2s;"
+        onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+      <input id="buyer-name" type="text" placeholder="Full name" 
+        style="width:100%; padding:0.75rem 1rem; border:1px solid #E2E8F0; border-radius:8px; font-size:0.9rem; outline:none; font-family:'Inter',sans-serif; margin-top:0.75rem; transition:border 0.2s;"
+        onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+
+      <!-- Currency Selector -->
+      <div style="margin-top:0.75rem;">
+        <select id="currency-select" onchange="updateCurrency()"
+          style="width:100%; padding:0.75rem 1rem; border:1px solid #E2E8F0; border-radius:8px; font-size:0.9rem; outline:none; font-family:'Inter',sans-serif; background:white; cursor:pointer;">
+          <option value="GHS">🇬🇭 Ghana Cedis (GHS)</option>
+          <option value="NGN">🇳🇬 Nigerian Naira (NGN)</option>
+          <option value="KES">🇰🇪 Kenyan Shilling (KES)</option>
+          <option value="ZAR">🇿🇦 South African Rand (ZAR)</option>
+          <option value="USD">🇺🇸 US Dollar (USD)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Order Total -->
+    <div style="padding:1rem 1.5rem; background:#F8F9FA; display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-size:0.78rem; color:#8892A4;">Total Amount</div>
+        <div id="modal-total" style="font-size:1.4rem; font-weight:800; color:#0A1628;"></div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:0.7rem; color:#10B981; font-weight:600;">🔒 Secured by Paystack</div>
+        <div style="font-size:0.68rem; color:#8892A4; margin-top:0.2rem;">Buyer Protection Active</div>
+      </div>
+    </div>
+
+    <!-- Pay Button -->
+    <div style="padding:1.2rem 1.5rem;">
+      <button onclick="initiatePayment()"
+        style="width:100%; background:#C9A84C; color:#0A1628; border:none; padding:1rem; border-radius:8px; font-size:1rem; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.2s; letter-spacing:0.3px;"
+        onmouseover="this.style.background='#E8C76A'" onmouseout="this.style.background='#C9A84C'">
+        Pay Now with Paystack →
+      </button>
+      <div style="text-align:center; margin-top:0.8rem; font-size:0.75rem; color:#8892A4;">
+        By paying you agree to PanMart's Terms of Service
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div id="success-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1001; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:14px; width:90%; max-width:400px; padding:2.5rem; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+    <div style="font-size:4rem; margin-bottom:1rem;">✅</div>
+    <div style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:800; color:#0A1628; margin-bottom:0.5rem;">Payment Successful!</div>
+    <div id="success-ref" style="font-size:0.82rem; color:#8892A4; margin-bottom:0.5rem;"></div>
+    <div id="success-product" style="font-size:0.9rem; color:#0A1628; font-weight:500; margin-bottom:1.5rem;"></div>
+    <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:1rem; margin-bottom:1.5rem;">
+      <div style="font-size:0.8rem; color:#166534;">A confirmation has been sent to your email. The seller will contact you within 24 hours.</div>
+    </div>
+    <button onclick="closeSuccess()"
+      style="background:#0A1628; color:white; border:none; padding:0.8rem 2rem; border-radius:8px; font-size:0.9rem; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif;">
+      Continue Shopping
+    </button>
+  </div>
+</div>
+
+<!-- CART ICON (floating) -->
+<div id="cart-btn" onclick="toggleCart()" style="position:fixed; bottom:2rem; right:2rem; background:#0A1628; color:white; width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 20px rgba(0,0,0,0.3); z-index:999; font-size:1.4rem; border:2px solid #C9A84C; transition:transform 0.2s;"
+  onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+  🛒
+  <div id="cart-count" style="position:absolute; top:-4px; right:-4px; background:#C9A84C; color:#0A1628; font-size:0.65rem; font-weight:800; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center;">0</div>
+</div>
+
+<!-- CART DRAWER -->
+<div id="cart-drawer" style="display:none; position:fixed; bottom:5rem; right:2rem; background:white; border-radius:12px; width:320px; box-shadow:0 10px 40px rgba(0,0,0,0.2); z-index:998; border:1px solid #E2E8F0; overflow:hidden;">
+  <div style="background:#0A1628; padding:1rem 1.2rem; display:flex; justify-content:space-between; align-items:center;">
+    <div style="color:white; font-weight:700; font-size:0.95rem;">🛒 Your Cart</div>
+    <button onclick="toggleCart()" style="background:none; border:none; color:#8892A4; cursor:pointer; font-size:1.1rem;">✕</button>
+  </div>
+  <div id="cart-items" style="padding:1rem; max-height:280px; overflow-y:auto;">
+    <div id="cart-empty" style="text-align:center; padding:2rem; color:#8892A4; font-size:0.85rem;">Your cart is empty</div>
+  </div>
+  <div id="cart-footer" style="display:none; padding:1rem; border-top:1px solid #E2E8F0;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem;">
+      <span style="font-weight:600; color:#0A1628;">Total</span>
+      <span id="cart-total" style="font-weight:800; color:#C9A84C;"></span>
+    </div>
+    <button onclick="checkoutCart()" style="width:100%; background:#C9A84C; color:#0A1628; border:none; padding:0.75rem; border-radius:7px; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif;">
+      Checkout →
+    </button>
+  </div>
+</div>
+
+<script>
+  // ============================================
+  // PAYSTACK CONFIG — Replace with your real key
+  // ============================================
+  const PAYSTACK_PUBLIC_KEY = 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+
+  // ============================================
+  // SUPABASE INIT
+  // ============================================
+  const SUPABASE_URL = 'https://ejbnqlcwxwuyjzvrrsxo.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqYm5xbGN3eHd1eWp6dnJyc3hvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzODM5NjUsImV4cCI6MjA5Njk1OTk2NX0.r8pI4gxA36Ld1url68fktdqVH3EGQlnx2ED1myjsTDw';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Check existing session on load
+  window.addEventListener('load', async function() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      currentUser = { name: session.user.email.split('@')[0], email: session.user.email, id: session.user.id };
+      updateNavUser();
+    }
+    renderDashboardProducts();
+    renderResults();
+  });
+
+  // Products data
+  const products = [
+    { id: 1, name: 'Tecno Spark 20 Pro — 256GB', price: 2450, currency: 'GHS', icon: '💻', seller: 'TechHub Ghana' },
+    { id: 2, name: 'STRVRR Classic Drop Shoulder Tee', price: 180, currency: 'GHS', icon: '👕', seller: 'STRVRR Official' },
+    { id: 3, name: 'Custom MT5 Expert Advisor — SMC Strategy', price: 60, currency: 'USD', icon: '📊', seller: 'STRVRR Dev' },
+    { id: 4, name: 'Sony WH-1000XM5 Wireless Headphones', price: 189000, currency: 'NGN', icon: '🎧', seller: 'AudioPro Lagos' },
+    { id: 5, name: 'Adidas Samba OG — Limited African Edition', price: 2800, currency: 'ZAR', icon: '👟', seller: 'KicksCulture SA' },
+    { id: 6, name: 'Logo & Brand Identity Design Package', price: 35, currency: 'USD', icon: '🖥️', seller: 'CreativeMind Kenya' },
+    { id: 7, name: 'Samsung Galaxy Tab S9 FE — 128GB', price: 3200, currency: 'GHS', icon: '📱', seller: 'GadgetWorld GH' },
+    { id: 8, name: 'Kente Weave Bomber Jacket — Custom', price: 650, currency: 'GHS', icon: '🧵', seller: 'AfriStyle Accra' }
+  ];
+
+  let cart = [];
+  let currentProduct = null;
+
+  // Currency symbols
+  const symbols = { GHS: 'GHS ', NGN: '₦', KES: 'KSh ', ZAR: 'R', USD: '$' };
+
+  // Format price
+  function fmt(amount, currency) {
+    return symbols[currency] + amount.toLocaleString();
+  }
+
+  // Open checkout modal
+  function openCheckout(productId) {
+    const p = products.find(x => x.id === productId);
+    currentProduct = p;
+    document.getElementById('modal-icon').textContent = p.icon;
+    document.getElementById('modal-name').textContent = p.name;
+    document.getElementById('modal-seller').textContent = 'Sold by ' + p.seller;
+    document.getElementById('modal-price').textContent = fmt(p.price, p.currency);
+    document.getElementById('modal-total').textContent = fmt(p.price, p.currency);
+    document.getElementById('currency-select').value = p.currency;
+    document.getElementById('buyer-email').value = '';
+    document.getElementById('buyer-name').value = '';
+    const overlay = document.getElementById('checkout-overlay');
+    overlay.style.display = 'flex';
+  }
+
+  function closeCheckout() {
+    document.getElementById('checkout-overlay').style.display = 'none';
+  }
+
+  function updateCurrency() {
+    const cur = document.getElementById('currency-select').value;
+    if (currentProduct) {
+      document.getElementById('modal-total').textContent = fmt(currentProduct.price, cur);
+    }
+  }
+
+  // Initiate Paystack payment
+  function initiatePayment() {
+    const email = document.getElementById('buyer-email').value.trim();
+    const name = document.getElementById('buyer-name').value.trim();
+    const currency = document.getElementById('currency-select').value;
+
+    if (!email || !email.includes('@')) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+    if (!name) {
+      alert('Please enter your full name.');
+      return;
+    }
+
+    const amount = currentProduct.price * 100; // Convert to lowest unit
+
+    let handler = PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: email,
+      amount: amount,
+      currency: currency,
+      ref: 'PANMART_' + Date.now() + '_' + Math.floor(Math.random() * 9999),
+      metadata: {
+        custom_fields: [
+          { display_name: 'Product', variable_name: 'product', value: currentProduct.name },
+          { display_name: 'Seller', variable_name: 'seller', value: currentProduct.seller },
+          { display_name: 'Buyer Name', variable_name: 'buyer_name', value: name }
+        ]
+      },
+      callback: async function(response) {
+        // Save order to Supabase
+        const orderData = {
+          amount: currentProduct.price,
+          currency: document.getElementById('currency-select').value,
+          paystack_ref: response.reference,
+          status: 'paid'
+        };
+        if (currentUser && currentUser.id) {
+          orderData.buyer_id = currentUser.id;
+        }
+        const { error } = await sb.from('orders').insert(orderData);
+        if (error) console.error('Order save error:', error);
+        closeCheckout();
+        showSuccess(response.reference, currentProduct.name);
+      },
+      onClose: function() {
+        // User closed the payment window
+      }
+    });
+
+    handler.openIframe();
+  }
+
+  // Show success modal
+  function showSuccess(ref, productName) {
+    document.getElementById('success-ref').textContent = 'Reference: ' + ref;
+    document.getElementById('success-product').textContent = productName;
+    document.getElementById('success-overlay').style.display = 'flex';
+  }
+
+  function closeSuccess() {
+    document.getElementById('success-overlay').style.display = 'none';
+  }
+
+  // Cart functionality
+  function addToCart(productId) {
+    const p = products.find(x => x.id === productId);
+    const existing = cart.find(x => x.id === productId);
+    if (existing) {
+      existing.qty += 1;
+    } else {
+      cart.push({ ...p, qty: 1 });
+    }
+    updateCartUI();
+    // Flash cart button
+    const btn = document.getElementById('cart-btn');
+    btn.style.transform = 'scale(1.3)';
+    setTimeout(() => btn.style.transform = 'scale(1)', 200);
+  }
+
+  function removeFromCart(productId) {
+    cart = cart.filter(x => x.id !== productId);
+    updateCartUI();
+  }
+
+  function updateCartUI() {
+    const count = cart.reduce((s, x) => s + x.qty, 0);
+    document.getElementById('cart-count').textContent = count;
+
+    const itemsEl = document.getElementById('cart-items');
+    const footerEl = document.getElementById('cart-footer');
+    const emptyEl = document.getElementById('cart-empty');
+
+    if (cart.length === 0) {
+      emptyEl.style.display = 'block';
+      footerEl.style.display = 'none';
+      itemsEl.innerHTML = '<div id="cart-empty" style="text-align:center; padding:2rem; color:#8892A4; font-size:0.85rem;">Your cart is empty</div>';
+      return;
+    }
+
+    emptyEl && (emptyEl.style.display = 'none');
+    footerEl.style.display = 'block';
+
+    let html = '';
+    let total = 0;
+    cart.forEach(item => {
+      total += item.price * item.qty;
+      html += `
+        <div style="display:flex; align-items:center; gap:0.8rem; padding:0.6rem 0; border-bottom:1px solid #F1F5F9;">
+          <div style="font-size:1.5rem;">${item.icon}</div>
+          <div style="flex:1;">
+            <div style="font-size:0.8rem; font-weight:600; color:#0A1628; line-height:1.3;">${item.name}</div>
+            <div style="font-size:0.75rem; color:#C9A84C; font-weight:600;">${fmt(item.price, item.currency)} × ${item.qty}</div>
+          </div>
+          <button onclick="removeFromCart(${item.id})" style="background:none; border:none; color:#EF4444; cursor:pointer; font-size:1rem;">🗑</button>
+        </div>`;
+    });
+
+    itemsEl.innerHTML = html;
+    document.getElementById('cart-total').textContent = 'GHS ' + total.toLocaleString();
+  }
+
+  function toggleCart() {
+    const drawer = document.getElementById('cart-drawer');
+    drawer.style.display = drawer.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function checkoutCart() {
+    if (cart.length === 0) return;
+    // For cart checkout, open with first item (extend for multi-product later)
+    openCheckout(cart[0].id);
+    toggleCart();
+  }
+
+  // Close modals on overlay click
+  document.getElementById('checkout-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeCheckout();
+  });
+  document.getElementById('success-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeSuccess();
+  });
+
+
+// ============================================
+// PAGE ROUTER
+// ============================================
+function goSearch() {
+  const q = document.querySelector('.nav-search input').value.trim();
+  showPage('search');
+  if (q) {
+    document.getElementById('search-input').value = q;
+    runSearch(q);
+  }
+}
+
+function showPage(page) {
+  document.getElementById('main-content').style.display = page === 'home' ? 'block' : 'none';
+  document.getElementById('seller-register-page').style.display = page === 'register' ? 'block' : 'none';
+  document.getElementById('seller-dashboard-page').style.display = page === 'dashboard' ? 'block' : 'none';
+  document.getElementById('login-page').style.display = page === 'login' ? 'block' : 'none';
+  document.getElementById('search-page').style.display = page === 'search' ? 'block' : 'none';
+  window.scrollTo(0, 0);
+}
+
+// ============================================
+// SELLER REGISTRATION
+// ============================================
+function nextStep(step) {
+  if (step === 2) {
+    const name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
+    const country = document.getElementById('reg-country').value;
+    if (!name || !email || !phone || !country) { showFormError('reg-error-1','Please fill in all fields.'); return; }
+    if (!email.includes('@')) { showFormError('reg-error-1','Please enter a valid email.'); return; }
+    clearFormError('reg-error-1');
+  }
+  if (step === 3) {
+    const bname = document.getElementById('reg-bname').value.trim();
+    const category = document.getElementById('reg-category').value;
+    const desc = document.getElementById('reg-desc').value.trim();
+    if (!bname || !category || !desc) { showFormError('reg-error-2','Please fill in all fields.'); return; }
+    clearFormError('reg-error-2');
+  }
+  document.querySelectorAll('.reg-step').forEach(el => el.style.display = 'none');
+  document.getElementById('reg-step-' + step).style.display = 'block';
+  document.querySelectorAll('.step-dot').forEach((dot, i) => {
+    dot.style.background = i + 1 <= step ? '#C9A84C' : '#E2E8F0';
+    dot.style.color = i + 1 <= step ? '#0A1628' : '#8892A4';
+  });
+}
+
+function showFormError(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.style.display = 'block'; }
+function clearFormError(id) { const el = document.getElementById(id); el.textContent = ''; el.style.display = 'none'; }
+
+function submitRegistration() {
+  const password = document.getElementById('reg-password').value;
+  const confirm = document.getElementById('reg-confirm').value;
+  if (password.length < 8) { showFormError('reg-error-3','Password must be at least 8 characters.'); return; }
+  if (password !== confirm) { showFormError('reg-error-3','Passwords do not match.'); return; }
+  clearFormError('reg-error-3');
+  nextStep(4);
+}
+
+// ============================================
+// PRODUCT UPLOAD
+// ============================================
+function handleImageUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const preview = document.getElementById('img-preview');
+    preview.style.backgroundImage = "url(" + e.target.result + ")";
+    preview.style.backgroundSize = 'cover';
+    preview.style.backgroundPosition = 'center';
+    preview.innerHTML = '<div style="background:rgba(0,0,0,0.5);color:white;padding:0.3rem 0.6rem;border-radius:5px;font-size:0.75rem;">\u2713 ' + file.name + '</div>';
+  };
+  reader.readAsDataURL(file);
+}
+
+function getCategoryIcon(cat) {
+  const icons = { 'electronics':'\ud83d\udcbb','fashion':'\ud83d\udc55','digital':'\ud83c\udfa8','food':'\ud83c\udf3d','health':'\ud83d\udc8a','home':'\ud83c\udfe0','automotive':'\ud83d\ude97','arts':'\ud83d\uddbc\ufe0f' };
+  return icons[cat] || '\ud83d\udce6';
+}
+
+let dashboardProducts = [
+  { name: 'STRVRR Tee', price: 180, currency: 'GHS', icon: '\ud83d\udc55', status: 'Active', sales: 12 },
+  { name: 'SMC EA Strategy', price: 60, currency: 'USD', icon: '\ud83d\udcca', status: 'Active', sales: 8 }
+];
+
+function renderDashboardProducts() {
+  const list = document.getElementById('dashboard-products-list');
+  if (!list) return;
+  list.innerHTML = dashboardProducts.map(function(p) {
+    return '<div style="display:flex;align-items:center;gap:1rem;padding:0.9rem;background:#F8F9FA;border-radius:8px;border:1px solid #E2E8F0;margin-bottom:0.6rem;">' +
+      '<div style="font-size:1.8rem;">' + p.icon + '</div>' +
+      '<div style="flex:1;"><div style="font-weight:600;font-size:0.88rem;color:#0A1628;">' + p.name + '</div>' +
+      '<div style="font-size:0.75rem;color:#8892A4;margin-top:0.1rem;">' + p.currency + ' ' + p.price.toLocaleString() + ' &nbsp;&middot;&nbsp; ' + p.sales + ' sales</div></div>' +
+      '<span style="background:' + (p.status==='Active'?'#D1FAE5':'#FEE2E2') + ';color:' + (p.status==='Active'?'#065F46':'#991B1B') + ';font-size:0.7rem;font-weight:600;padding:0.2rem 0.6rem;border-radius:20px;">' + p.status + '</span></div>';
+  }).join('');
+  const countEl = document.getElementById('product-count');
+  if (countEl) countEl.textContent = dashboardProducts.length;
+}
+
+async function submitProduct() {
+  const name = document.getElementById('prod-name').value.trim();
+  const price = document.getElementById('prod-price').value.trim();
+  const category = document.getElementById('prod-cat').value;
+  const desc = document.getElementById('prod-desc').value.trim();
+  const currency = document.getElementById('prod-currency').value;
+  if (!name || !price || !category || !desc) { showFormError('prod-error','Please fill in all required fields.'); return; }
+  if (isNaN(price) || parseFloat(price) <= 0) { showFormError('prod-error','Please enter a valid price.'); return; }
+  clearFormError('prod-error');
+
+  const btn = document.querySelector('#product-form button[onclick="submitProduct()"]');
+  if (btn) { btn.textContent = 'Saving...'; btn.disabled = true; }
+
+  // Save to Supabase products table
+  const productData = {
+    name: name,
+    price: parseFloat(price),
+    currency: currency,
+    category: category,
+    description: desc,
+    is_active: true
+  };
+
+  const { data: sbData, error } = await sb.from('products').insert(productData).select();
+  if (btn) { btn.textContent = '+ List Product'; btn.disabled = false; }
+
+  if (error) {
+    showFormError('prod-error', 'Error saving: ' + error.message);
+    return;
+  }
+
+  // Also add to local display
+  const newProduct = { id: products.length + 1, name, price: parseFloat(price), currency, icon: getCategoryIcon(category), seller: currentUser ? currentUser.name : 'My Store' };
+  products.push(newProduct);
+  dashboardProducts.push({ name, price: parseFloat(price), currency, icon: getCategoryIcon(category), status: 'Active', sales: 0 });
+  renderDashboardProducts();
+  document.getElementById('product-form').style.display = 'none';
+  document.getElementById('upload-success').style.display = 'block';
+}
+
+function resetProductForm() {
+  document.getElementById('product-form').style.display = 'block';
+  document.getElementById('upload-success').style.display = 'none';
+  ['prod-name','prod-price','prod-desc'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('prod-cat').value = '';
+  const preview = document.getElementById('img-preview');
+  preview.style.backgroundImage = '';
+  preview.innerHTML = '<div style="text-align:center;"><div style="font-size:2rem;margin-bottom:0.5rem;">\ud83d\udcf8</div><div style="font-size:0.82rem;color:#8892A4;">Click to upload product image</div><div style="font-size:0.72rem;color:#8892A4;margin-top:0.2rem;">JPG, PNG up to 5MB</div></div>';
+}
+
+// Init dashboard on page load
+window.addEventListener('load', function() { renderDashboardProducts(); });
+</script>
+
+</div><!-- end main-content -->
+
+<!-- ============================================ -->
+<!-- SELLER REGISTRATION PAGE -->
+<!-- ============================================ -->
+<div id="seller-register-page" style="display:none;min-height:100vh;background:#F1F5F9;">
+  <div style="background:#0A1628;padding:1rem 5%;display:flex;align-items:center;justify-content:space-between;">
+    <div onclick="showPage('home')" style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:800;color:white;cursor:pointer;">Pan<span style="color:#C9A84C;">Mart</span></div>
+    <button onclick="showPage('home')" style="background:none;border:1px solid rgba(255,255,255,0.2);color:#8892A4;padding:0.4rem 1rem;border-radius:5px;cursor:pointer;font-size:0.85rem;">← Back</button>
+  </div>
+  <div style="max-width:560px;margin:0 auto;padding:3rem 1.5rem;">
+    <div style="text-align:center;margin-bottom:2rem;">
+      <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:800;color:#0A1628;">Become a <span style="color:#C9A84C;">PanMart</span> Seller</div>
+      <div style="color:#8892A4;font-size:0.88rem;margin-top:0.4rem;">Join 180,000+ sellers reaching buyers across Africa</div>
+    </div>
+    <!-- Step dots -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:2rem;">
+      <div class="step-dot" style="width:34px;height:34px;border-radius:50%;background:#C9A84C;color:#0A1628;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;">1</div>
+      <div style="width:55px;height:2px;background:#E2E8F0;"></div>
+      <div class="step-dot" style="width:34px;height:34px;border-radius:50%;background:#E2E8F0;color:#8892A4;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;">2</div>
+      <div style="width:55px;height:2px;background:#E2E8F0;"></div>
+      <div class="step-dot" style="width:34px;height:34px;border-radius:50%;background:#E2E8F0;color:#8892A4;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;">3</div>
+    </div>
+    <div style="background:white;border-radius:14px;padding:2rem;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid #E2E8F0;">
+      <!-- Step 1 -->
+      <div class="reg-step" id="reg-step-1">
+        <div style="font-weight:700;color:#0A1628;margin-bottom:1.2rem;">Personal Information</div>
+        <input id="reg-name" type="text" placeholder="Full Name *" style="width:100%;padding:0.7rem 1rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;margin-bottom:0.8rem;" onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+        <input id="reg-email" type="email" placeholder="Email Address *" style="width:100%;padding:0.7rem 1rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;margin-bottom:0.8rem;" onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+        <input id="reg-phone" type="tel" placeholder="Phone Number *" style="width:100%;padding:0.7rem 1rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;margin-bottom:0.8rem;" onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+        <select id="reg-country" style="width:100%;padding:0.7rem 1rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;background:white;margin-bottom:1.2rem;">
+          <option value="">Select Country *</option>
+          <option value="GH">🇬🇭 Ghana</option><option value="NG">🇳🇬 Nigeria</option><option value="KE">🇰🇪 Kenya</option><option value="ZA">🇿🇦 South Africa</option>
+          <option value="SN">🇸🇳 Senegal</option><option value="ET">🇪🇹 Ethiopia</option><option value="TZ">🇹🇿 Tanzania</option><option value="OTHER">🌍 Other</option>
+        </select>
+        <div id="reg-error-1" style="display:none;color:#EF4444;font-size:0.78rem;margin-bottom:0.8rem;background:#FEF2F2;padding:0.5rem 0.8rem;border-radius:6px;"></div>
+        <button onclick="nextStep(2)" style="width:100%;background:#C9A84C;color:#0A1628;border:none;padding:0.85rem;border-radius:8px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Continue →</button>
+      </div>
+      <!-- Step 2 -->
+      <div class="reg-step" id="reg-step-2" style="display:none;">
+        <div style="font-weight:700;color:#0A1628;margin-bottom:1.2rem;">Store Details</div>
+        <input id="reg-bname" type="text" placeholder="Store / Business Name *" style="width:100%;padding:0.7rem 1rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;margin-bottom:0.8rem;" onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+        <select id="reg-category" style="width:100%;padding:0.7rem 1rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;background:white;margin-bottom:0.8rem;">
+          <option value="">Primary Category *</option>
+          <option value="fashion">👕 Fashion</option><option value="electronics">💻 Electronics</option><option value="digital">🎨 Digital Services</option>
+          <option value="food">🌽 Food & Agriculture</option><option value="health">💊 Health</option><option value="home">🏠 Home</option><option value="arts">🖼️ Arts</option>
+        </select>
+        <textarea id="reg-desc" placeholder="Describe your store *" rows="4" style="width:100%;padding:0.7rem 1rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;resize:vertical;margin-bottom:1.2rem;" onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'"></textarea>
+        <div id="reg-error-2" style="display:none;color:#EF4444;font-size:0.78rem;margin-bottom:0.8rem;background:#FEF2F2;padding:0.5rem 0.8rem;border-radius:6px;"></div>
+        <div style="display:flex;gap:0.8rem;">
+          <button onclick="nextStep(1)" style="flex:1;background:#F1F5F9;color:#0A1628;border:none;padding:0.85rem;border-radius:8px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">← Back</button>
+          <button onclick="nextStep(3)" style="flex:2;background:#C9A84C;color:#0A1628;border:none;padding:0.85rem;border-radius:8px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Continue →</button>
+        </div>
+      </div>
+      <!-- Step 3 -->
+      <div class="reg-step" id="reg-step-3" style="display:none;">
+        <div style="font-weight:700;color:#0A1628;margin-bottom:1.2rem;">Create Your Account</div>
+        <input id="reg-password" type="password" placeholder="Password (min. 8 chars) *" style="width:100%;padding:0.7rem 1rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;margin-bottom:0.8rem;" onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+        <input id="reg-confirm" type="password" placeholder="Confirm Password *" style="width:100%;padding:0.7rem 1rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;margin-bottom:1.2rem;" onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+        <div style="background:#F8F9FA;border-radius:8px;padding:0.9rem;margin-bottom:1.2rem;font-size:0.77rem;color:#8892A4;">By registering you agree to PanMart's Terms of Service. First 3 months are <strong style="color:#10B981;">listing fee free.</strong></div>
+        <div id="reg-error-3" style="display:none;color:#EF4444;font-size:0.78rem;margin-bottom:0.8rem;background:#FEF2F2;padding:0.5rem 0.8rem;border-radius:6px;"></div>
+        <div style="display:flex;gap:0.8rem;">
+          <button onclick="nextStep(2)" style="flex:1;background:#F1F5F9;color:#0A1628;border:none;padding:0.85rem;border-radius:8px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">← Back</button>
+          <button onclick="submitRegistration()" style="flex:2;background:#0A1628;color:white;border:none;padding:0.85rem;border-radius:8px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Create Seller Account 🚀</button>
+        </div>
+      </div>
+      <!-- Step 4 Success -->
+      <div class="reg-step" id="reg-step-4" style="display:none;text-align:center;padding:1.5rem 0;">
+        <div style="font-size:3.5rem;margin-bottom:1rem;">🎉</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:800;color:#0A1628;margin-bottom:0.4rem;">Welcome to PanMart!</div>
+        <div style="color:#8892A4;font-size:0.85rem;margin-bottom:1.5rem;">Your seller account is live. Start listing products now.</div>
+        <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:1rem;margin-bottom:1.5rem;text-align:left;">
+          <div style="font-size:0.78rem;color:#166534;font-weight:600;">✓ Free listing for 3 months activated</div>
+          <div style="font-size:0.78rem;color:#166534;margin-top:0.3rem;">✓ Seller dashboard ready</div>
+          <div style="font-size:0.78rem;color:#166534;margin-top:0.3rem;">✓ Paystack payouts enabled</div>
+        </div>
+        <button onclick="showPage('dashboard')" style="width:100%;background:#C9A84C;color:#0A1628;border:none;padding:0.9rem;border-radius:8px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Go to Seller Dashboard →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SELLER DASHBOARD PAGE -->
+<!-- ============================================ -->
+<div id="seller-dashboard-page" style="display:none;min-height:100vh;background:#F1F5F9;">
+  <div style="background:#0A1628;padding:1rem 5%;display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:800;color:white;">Pan<span style="color:#C9A84C;">Mart</span> <span style="font-size:0.72rem;color:#8892A4;font-family:'Inter',sans-serif;font-weight:400;">Seller Dashboard</span></div>
+    <div style="display:flex;gap:1rem;align-items:center;">
+      <button onclick="showPage('home')" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#8892A4;padding:0.4rem 1rem;border-radius:5px;cursor:pointer;font-size:0.82rem;">🛒 Marketplace</button>
+      <div style="width:32px;height:32px;background:#C9A84C;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0A1628;font-size:0.85rem;">S</div>
+    </div>
+  </div>
+  <div style="max-width:1000px;margin:0 auto;padding:2rem 1.5rem;">
+    <div style="margin-bottom:1.5rem;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:800;color:#0A1628;">Welcome back, <span style="color:#C9A84C;">Seller</span> 👋</div>
+    </div>
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;">
+      <div style="background:white;border-radius:10px;padding:1.1rem;border:1px solid #E2E8F0;">
+        <div style="font-size:0.7rem;color:#8892A4;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Total Sales</div>
+        <div style="font-size:1.4rem;font-weight:800;color:#0A1628;margin-top:0.3rem;">GHS 2,760</div>
+        <div style="font-size:0.7rem;color:#10B981;margin-top:0.2rem;">↑ 14% this week</div>
+      </div>
+      <div style="background:white;border-radius:10px;padding:1.1rem;border:1px solid #E2E8F0;">
+        <div style="font-size:0.7rem;color:#8892A4;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Orders</div>
+        <div style="font-size:1.4rem;font-weight:800;color:#0A1628;margin-top:0.3rem;">20</div>
+        <div style="font-size:0.7rem;color:#10B981;margin-top:0.2rem;">↑ 3 new today</div>
+      </div>
+      <div style="background:white;border-radius:10px;padding:1.1rem;border:1px solid #E2E8F0;">
+        <div style="font-size:0.7rem;color:#8892A4;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Products</div>
+        <div id="product-count" style="font-size:1.4rem;font-weight:800;color:#0A1628;margin-top:0.3rem;">2</div>
+        <div style="font-size:0.7rem;color:#8892A4;margin-top:0.2rem;">Active listings</div>
+      </div>
+      <div style="background:white;border-radius:10px;padding:1.1rem;border:1px solid #E2E8F0;">
+        <div style="font-size:0.7rem;color:#8892A4;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Rating</div>
+        <div style="font-size:1.4rem;font-weight:800;color:#C9A84C;margin-top:0.3rem;">4.9 ★</div>
+        <div style="font-size:0.7rem;color:#8892A4;margin-top:0.2rem;">From 20 reviews</div>
+      </div>
+    </div>
+    <!-- Two columns -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+      <!-- Product Upload -->
+      <div style="background:white;border-radius:12px;padding:1.5rem;border:1px solid #E2E8F0;">
+        <div style="font-weight:700;color:#0A1628;font-size:0.95rem;margin-bottom:1.1rem;">📦 Add New Product</div>
+        <div id="product-form">
+          <div id="img-preview" onclick="document.getElementById('img-input').click()"
+            style="border:2px dashed #E2E8F0;border-radius:8px;height:100px;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:0.8rem;"
+            onmouseover="this.style.borderColor='#C9A84C'" onmouseout="this.style.borderColor='#E2E8F0'">
+            <div style="text-align:center;"><div style="font-size:1.8rem;">📸</div><div style="font-size:0.78rem;color:#8892A4;margin-top:0.3rem;">Upload image</div></div>
+          </div>
+          <input type="file" id="img-input" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
+          <input id="prod-name" type="text" placeholder="Product name *" style="width:100%;padding:0.65rem 0.9rem;border:1px solid #E2E8F0;border-radius:7px;font-size:0.84rem;outline:none;font-family:'Inter',sans-serif;margin-bottom:0.6rem;" onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;">
+            <input id="prod-price" type="number" placeholder="Price *" min="0" style="width:100%;padding:0.65rem 0.9rem;border:1px solid #E2E8F0;border-radius:7px;font-size:0.84rem;outline:none;font-family:'Inter',sans-serif;" onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+            <select id="prod-currency" style="width:100%;padding:0.65rem 0.9rem;border:1px solid #E2E8F0;border-radius:7px;font-size:0.84rem;outline:none;font-family:'Inter',sans-serif;background:white;">
+              <option value="GHS">GHS</option><option value="NGN">NGN</option><option value="USD">USD</option><option value="KES">KES</option><option value="ZAR">ZAR</option>
+            </select>
+          </div>
+          <select id="prod-cat" style="width:100%;padding:0.65rem 0.9rem;border:1px solid #E2E8F0;border-radius:7px;font-size:0.84rem;outline:none;font-family:'Inter',sans-serif;background:white;margin-bottom:0.6rem;">
+            <option value="">Category *</option>
+            <option value="fashion">👕 Fashion</option><option value="electronics">💻 Electronics</option><option value="digital">🎨 Digital Services</option>
+            <option value="food">🌽 Food</option><option value="health">💊 Health</option><option value="home">🏠 Home</option><option value="arts">🖼️ Arts</option>
+          </select>
+          <textarea id="prod-desc" placeholder="Description *" rows="2" style="width:100%;padding:0.65rem 0.9rem;border:1px solid #E2E8F0;border-radius:7px;font-size:0.84rem;outline:none;font-family:'Inter',sans-serif;resize:vertical;margin-bottom:0.8rem;" onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'"></textarea>
+          <div id="prod-error" style="display:none;color:#EF4444;font-size:0.76rem;margin-bottom:0.7rem;background:#FEF2F2;padding:0.5rem 0.7rem;border-radius:6px;"></div>
+          <button onclick="submitProduct()" style="width:100%;background:#0A1628;color:white;border:none;padding:0.75rem;border-radius:8px;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:'Inter',sans-serif;" onmouseover="this.style.background='#C9A84C';this.style.color='#0A1628'" onmouseout="this.style.background='#0A1628';this.style.color='white'">+ List Product</button>
+        </div>
+        <div id="upload-success" style="display:none;text-align:center;padding:1.5rem 0;">
+          <div style="font-size:2.5rem;margin-bottom:0.8rem;">✅</div>
+          <div style="font-weight:700;color:#0A1628;margin-bottom:0.4rem;">Product Listed!</div>
+          <div style="font-size:0.82rem;color:#8892A4;margin-bottom:1.2rem;">Now live on PanMart.</div>
+          <button onclick="resetProductForm()" style="background:#C9A84C;color:#0A1628;border:none;padding:0.6rem 1.2rem;border-radius:7px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.84rem;">+ Add Another</button>
+        </div>
+      </div>
+      <!-- My Products + Orders -->
+      <div style="background:white;border-radius:12px;padding:1.5rem;border:1px solid #E2E8F0;">
+        <div style="font-weight:700;color:#0A1628;font-size:0.95rem;margin-bottom:1rem;">🗂 My Products</div>
+        <div id="dashboard-products-list"></div>
+        <div style="font-weight:700;color:#0A1628;font-size:0.95rem;margin:1.2rem 0 0.8rem;">📋 Recent Orders</div>
+        <div style="font-size:0.82rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:0.65rem 0;border-bottom:1px solid #F1F5F9;">
+            <div><div style="font-weight:600;color:#0A1628;">STRVRR Tee × 2</div><div style="color:#8892A4;font-size:0.72rem;">kofi@email.com · 2h ago</div></div>
+            <span style="background:#D1FAE5;color:#065F46;font-size:0.68rem;font-weight:600;padding:0.2rem 0.55rem;border-radius:20px;">Paid</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:0.65rem 0;border-bottom:1px solid #F1F5F9;">
+            <div><div style="font-weight:600;color:#0A1628;">SMC EA Strategy</div><div style="color:#8892A4;font-size:0.72rem;">trader@gmail.com · 5h ago</div></div>
+            <span style="background:#D1FAE5;color:#065F46;font-size:0.68rem;font-weight:600;padding:0.2rem 0.55rem;border-radius:20px;">Paid</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:0.65rem 0;">
+            <div><div style="font-weight:600;color:#0A1628;">STRVRR Tee × 1</div><div style="color:#8892A4;font-size:0.72rem;">ama@yahoo.com · 1d ago</div></div>
+            <span style="background:#FEF3C7;color:#92400E;font-size:0.68rem;font-weight:600;padding:0.2rem 0.55rem;border-radius:20px;">Processing</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================ -->
+<!-- LOGIN / SIGNUP PAGE -->
+<!-- ============================================ -->
+<div id="login-page" style="display:none;min-height:100vh;background:#F1F5F9;">
+  <div style="background:#0A1628;padding:1rem 5%;display:flex;align-items:center;justify-content:space-between;">
+    <div onclick="showPage('home')" style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:800;color:white;cursor:pointer;">Pan<span style="color:#C9A84C;">Mart</span></div>
+    <button onclick="showPage('home')" style="background:none;border:1px solid rgba(255,255,255,0.2);color:#8892A4;padding:0.4rem 1rem;border-radius:5px;cursor:pointer;font-size:0.85rem;">← Back</button>
+  </div>
+
+  <div style="max-width:460px;margin:0 auto;padding:3rem 1.5rem;">
+    <!-- Tab switcher -->
+    <div style="display:flex;background:white;border-radius:10px;padding:0.3rem;margin-bottom:2rem;border:1px solid #E2E8F0;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <button id="tab-login" onclick="switchAuthTab('login')"
+        style="flex:1;padding:0.65rem;border:none;border-radius:8px;font-weight:700;font-size:0.88rem;cursor:pointer;font-family:'Inter',sans-serif;background:#0A1628;color:white;transition:all 0.2s;">
+        Sign In
+      </button>
+      <button id="tab-signup" onclick="switchAuthTab('signup')"
+        style="flex:1;padding:0.65rem;border:none;border-radius:8px;font-weight:700;font-size:0.88rem;cursor:pointer;font-family:'Inter',sans-serif;background:transparent;color:#8892A4;transition:all 0.2s;">
+        Create Account
+      </button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="login-form-wrap" style="background:white;border-radius:14px;padding:2rem;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid #E2E8F0;">
+      <div style="text-align:center;margin-bottom:1.5rem;">
+        <div style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:800;color:#0A1628;">Welcome back</div>
+        <div style="color:#8892A4;font-size:0.85rem;margin-top:0.3rem;">Sign in to your PanMart account</div>
+      </div>
+
+      <!-- Social login -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1.2rem;">
+        <button onclick="socialLogin('google')" style="padding:0.65rem;border:1px solid #E2E8F0;border-radius:8px;background:white;cursor:pointer;font-size:0.82rem;font-weight:600;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:0.4rem;transition:border 0.2s;" onmouseover="this.style.borderColor='#C9A84C'" onmouseout="this.style.borderColor='#E2E8F0'">
+          <span style="font-size:1rem;">🔵</span> Google
+        </button>
+        <button onclick="socialLogin('facebook')" style="padding:0.65rem;border:1px solid #E2E8F0;border-radius:8px;background:white;cursor:pointer;font-size:0.82rem;font-weight:600;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:0.4rem;transition:border 0.2s;" onmouseover="this.style.borderColor='#C9A84C'" onmouseout="this.style.borderColor='#E2E8F0'">
+          <span style="font-size:1rem;">🔷</span> Facebook
+        </button>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:1.2rem;">
+        <div style="flex:1;height:1px;background:#E2E8F0;"></div>
+        <div style="font-size:0.75rem;color:#8892A4;font-weight:500;">or continue with email</div>
+        <div style="flex:1;height:1px;background:#E2E8F0;"></div>
+      </div>
+
+      <div style="margin-bottom:0.8rem;">
+        <label style="font-size:0.76rem;font-weight:600;color:#0A1628;display:block;margin-bottom:0.35rem;">Email Address</label>
+        <input id="login-email" type="email" placeholder="you@email.com"
+          style="width:100%;padding:0.72rem 1rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;"
+          onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+      </div>
+
+      <div style="margin-bottom:0.4rem;">
+        <label style="font-size:0.76rem;font-weight:600;color:#0A1628;display:block;margin-bottom:0.35rem;">Password</label>
+        <div style="position:relative;">
+          <input id="login-pass" type="password" placeholder="Your password"
+            style="width:100%;padding:0.72rem 1rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;"
+            onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+          <span onclick="togglePass('login-pass')" style="position:absolute;right:0.8rem;top:50%;transform:translateY(-50%);cursor:pointer;font-size:0.85rem;color:#8892A4;">👁</span>
+        </div>
+      </div>
+
+      <div style="text-align:right;margin-bottom:1.2rem;">
+        <span style="font-size:0.78rem;color:#C9A84C;cursor:pointer;font-weight:600;">Forgot password?</span>
+      </div>
+
+      <div id="login-error" style="display:none;color:#EF4444;font-size:0.78rem;margin-bottom:0.8rem;background:#FEF2F2;padding:0.5rem 0.8rem;border-radius:6px;"></div>
+
+      <button onclick="submitLogin()"
+        style="width:100%;background:#C9A84C;color:#0A1628;border:none;padding:0.85rem;border-radius:8px;font-weight:700;font-size:0.95rem;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:1rem;transition:background 0.2s;"
+        onmouseover="this.style.background='#E8C76A'" onmouseout="this.style.background='#C9A84C'">
+        Sign In
+      </button>
+
+      <div style="text-align:center;font-size:0.82rem;color:#8892A4;">
+        Don't have an account? <span onclick="switchAuthTab('signup')" style="color:#C9A84C;font-weight:600;cursor:pointer;">Create one</span>
+      </div>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div id="signup-form-wrap" style="display:none;background:white;border-radius:14px;padding:2rem;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid #E2E8F0;">
+      <div style="text-align:center;margin-bottom:1.5rem;">
+        <div style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:800;color:#0A1628;">Join PanMart</div>
+        <div style="color:#8892A4;font-size:0.85rem;margin-top:0.3rem;">Create your buyer account in seconds</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin-bottom:0.8rem;">
+        <div>
+          <label style="font-size:0.76rem;font-weight:600;color:#0A1628;display:block;margin-bottom:0.35rem;">First Name</label>
+          <input id="signup-fname" type="text" placeholder="Kofi"
+            style="width:100%;padding:0.72rem 0.9rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.86rem;outline:none;font-family:'Inter',sans-serif;"
+            onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+        </div>
+        <div>
+          <label style="font-size:0.76rem;font-weight:600;color:#0A1628;display:block;margin-bottom:0.35rem;">Last Name</label>
+          <input id="signup-lname" type="text" placeholder="Mensah"
+            style="width:100%;padding:0.72rem 0.9rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.86rem;outline:none;font-family:'Inter',sans-serif;"
+            onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+        </div>
+      </div>
+
+      <div style="margin-bottom:0.8rem;">
+        <label style="font-size:0.76rem;font-weight:600;color:#0A1628;display:block;margin-bottom:0.35rem;">Email Address</label>
+        <input id="signup-email" type="email" placeholder="you@email.com"
+          style="width:100%;padding:0.72rem 1rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;"
+          onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'">
+      </div>
+
+      <div style="margin-bottom:0.8rem;">
+        <label style="font-size:0.76rem;font-weight:600;color:#0A1628;display:block;margin-bottom:0.35rem;">Country</label>
+        <select id="signup-country"
+          style="width:100%;padding:0.72rem 1rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;background:white;">
+          <option value="">Select country</option>
+          <option value="GH">🇬🇭 Ghana</option><option value="NG">🇳🇬 Nigeria</option><option value="KE">🇰🇪 Kenya</option>
+          <option value="ZA">🇿🇦 South Africa</option><option value="SN">🇸🇳 Senegal</option><option value="OTHER">🌍 Other</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom:0.8rem;">
+        <label style="font-size:0.76rem;font-weight:600;color:#0A1628;display:block;margin-bottom:0.35rem;">Password</label>
+        <div style="position:relative;">
+          <input id="signup-pass" type="password" placeholder="Min. 8 characters"
+            style="width:100%;padding:0.72rem 1rem;border:1px solid #E2E8F0;border-radius:8px;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;"
+            onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#E2E8F0'" oninput="updateStrength(this.value)">
+          <span onclick="togglePass('signup-pass')" style="position:absolute;right:0.8rem;top:50%;transform:translateY(-50%);cursor:pointer;font-size:0.85rem;color:#8892A4;">👁</span>
+        </div>
+        <!-- Password strength -->
+        <div style="margin-top:0.4rem;display:flex;gap:0.3rem;">
+          <div id="str-1" style="flex:1;height:3px;border-radius:2px;background:#E2E8F0;transition:background 0.3s;"></div>
+          <div id="str-2" style="flex:1;height:3px;border-radius:2px;background:#E2E8F0;transition:background 0.3s;"></div>
+          <div id="str-3" style="flex:1;height:3px;border-radius:2px;background:#E2E8F0;transition:background 0.3s;"></div>
+          <div id="str-4" style="flex:1;height:3px;border-radius:2px;background:#E2E8F0;transition:background 0.3s;"></div>
+        </div>
+        <div id="str-label" style="font-size:0.7rem;color:#8892A4;margin-top:0.2rem;"></div>
+      </div>
+
+      <div style="background:#F8F9FA;border-radius:8px;padding:0.8rem;margin-bottom:1.2rem;font-size:0.76rem;color:#8892A4;">
+        By signing up you agree to PanMart's <span style="color:#C9A84C;cursor:pointer;">Terms</span> and <span style="color:#C9A84C;cursor:pointer;">Privacy Policy</span>.
+      </div>
+
+      <div id="signup-error" style="display:none;color:#EF4444;font-size:0.78rem;margin-bottom:0.8rem;background:#FEF2F2;padding:0.5rem 0.8rem;border-radius:6px;"></div>
+
+      <button onclick="submitSignup()"
+        style="width:100%;background:#0A1628;color:white;border:none;padding:0.85rem;border-radius:8px;font-weight:700;font-size:0.95rem;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:1rem;transition:background 0.2s;"
+        onmouseover="this.style.background='#C9A84C';this.style.color='#0A1628'" onmouseout="this.style.background='#0A1628';this.style.color='white'">
+        Create Account →
+      </button>
+
+      <div style="text-align:center;font-size:0.82rem;color:#8892A4;">
+        Already have an account? <span onclick="switchAuthTab('login')" style="color:#C9A84C;font-weight:600;cursor:pointer;">Sign in</span>
+      </div>
+    </div>
+
+    <!-- Logged in state -->
+    <div id="logged-in-wrap" style="display:none;background:white;border-radius:14px;padding:2rem;box-shadow:0 4px 20px rgba(0,0,0,0.06);border:1px solid #E2E8F0;text-align:center;">
+      <div style="font-size:3rem;margin-bottom:1rem;">👋</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:800;color:#0A1628;margin-bottom:0.4rem;">You're signed in!</div>
+      <div id="logged-in-name" style="color:#8892A4;font-size:0.88rem;margin-bottom:1.5rem;"></div>
+      <button onclick="showPage('home')" style="width:100%;background:#C9A84C;color:#0A1628;border:none;padding:0.85rem;border-radius:8px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:0.8rem;">Continue Shopping →</button>
+      <button onclick="logOut()" style="width:100%;background:#FEF2F2;color:#EF4444;border:1px solid #FEE2E2;padding:0.75rem;border-radius:8px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.88rem;">Sign Out</button>
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:2rem;margin-top:1.5rem;flex-wrap:wrap;">
+      <div style="font-size:0.73rem;color:#8892A4;">🔒 256-bit Encryption</div>
+      <div style="font-size:0.73rem;color:#8892A4;">🌍 Pan-African Coverage</div>
+      <div style="font-size:0.73rem;color:#8892A4;">✅ Verified Platform</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SEARCH & FILTER PAGE -->
+<!-- ============================================ -->
+<div id="search-page" style="display:none;min-height:100vh;background:#F1F5F9;">
+  <div style="background:#0A1628;padding:1rem 5%;display:flex;align-items:center;gap:1rem;">
+    <div onclick="showPage('home')" style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:800;color:white;cursor:pointer;white-space:nowrap;">Pan<span style="color:#C9A84C;">Mart</span></div>
+    <div style="flex:1;display:flex;background:#1A3357;border-radius:7px;overflow:hidden;border:1px solid rgba(201,168,76,0.25);">
+      <input id="search-input" type="text" placeholder="Search products, services, sellers..."
+        style="flex:1;background:transparent;border:none;padding:0.65rem 1rem;color:white;font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;"
+        onkeyup="if(event.key==='Enter') runSearch(this.value)">
+      <button onclick="runSearch(document.getElementById('search-input').value)"
+        style="background:#C9A84C;border:none;padding:0 1.1rem;color:#0A1628;font-weight:700;cursor:pointer;font-size:0.85rem;">Search</button>
+    </div>
+  </div>
+
+  <div style="max-width:1100px;margin:0 auto;padding:1.5rem;">
+    <div style="display:grid;grid-template-columns:220px 1fr;gap:1.5rem;">
+
+      <!-- FILTERS SIDEBAR -->
+      <div>
+        <div style="background:white;border-radius:12px;padding:1.2rem;border:1px solid #E2E8F0;margin-bottom:1rem;">
+          <div style="font-weight:700;color:#0A1628;font-size:0.92rem;margin-bottom:1rem;">🎛 Filters</div>
+
+          <!-- Category filter -->
+          <div style="margin-bottom:1.2rem;">
+            <div style="font-size:0.75rem;font-weight:600;color:#0A1628;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;">Category</div>
+            <div id="cat-filters">
+              <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:#0A1628;margin-bottom:0.4rem;cursor:pointer;"><input type="checkbox" value="all" checked onchange="applyFilters()" style="accent-color:#C9A84C;"> All</label>
+              <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:#0A1628;margin-bottom:0.4rem;cursor:pointer;"><input type="checkbox" value="electronics" onchange="applyFilters()" style="accent-color:#C9A84C;"> 💻 Electronics</label>
+              <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:#0A1628;margin-bottom:0.4rem;cursor:pointer;"><input type="checkbox" value="fashion" onchange="applyFilters()" style="accent-color:#C9A84C;"> 👕 Fashion</label>
+              <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:#0A1628;margin-bottom:0.4rem;cursor:pointer;"><input type="checkbox" value="digital" onchange="applyFilters()" style="accent-color:#C9A84C;"> 🎨 Digital Services</label>
+              <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:#0A1628;margin-bottom:0.4rem;cursor:pointer;"><input type="checkbox" value="food" onchange="applyFilters()" style="accent-color:#C9A84C;"> 🌽 Food</label>
+              <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:#0A1628;cursor:pointer;"><input type="checkbox" value="health" onchange="applyFilters()" style="accent-color:#C9A84C;"> 💊 Health</label>
+            </div>
+          </div>
+
+          <!-- Price Range -->
+          <div style="margin-bottom:1.2rem;">
+            <div style="font-size:0.75rem;font-weight:600;color:#0A1628;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;">Price Range (GHS)</div>
+            <input type="range" id="price-range" min="0" max="5000" value="5000" step="50"
+              style="width:100%;accent-color:#C9A84C;" oninput="updatePriceLabel(this.value); applyFilters()">
+            <div style="display:flex;justify-content:space-between;font-size:0.73rem;color:#8892A4;margin-top:0.3rem;">
+              <span>GHS 0</span>
+              <span id="price-label" style="color:#C9A84C;font-weight:600;">GHS 5,000</span>
+            </div>
+          </div>
+
+          <!-- Rating -->
+          <div style="margin-bottom:1.2rem;">
+            <div style="font-size:0.75rem;font-weight:600;color:#0A1628;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;">Min Rating</div>
+            <div style="display:flex;flex-direction:column;gap:0.35rem;">
+              <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;cursor:pointer;"><input type="radio" name="rating" value="0" checked onchange="applyFilters()" style="accent-color:#C9A84C;"> All ratings</label>
+              <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;cursor:pointer;"><input type="radio" name="rating" value="4" onchange="applyFilters()" style="accent-color:#C9A84C;"> ★★★★ & up</label>
+              <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;cursor:pointer;"><input type="radio" name="rating" value="5" onchange="applyFilters()" style="accent-color:#C9A84C;"> ★★★★★ only</label>
+            </div>
+          </div>
+
+          <!-- Country -->
+          <div>
+            <div style="font-size:0.75rem;font-weight:600;color:#0A1628;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;">Seller Country</div>
+            <select id="country-filter" onchange="applyFilters()"
+              style="width:100%;padding:0.55rem 0.8rem;border:1px solid #E2E8F0;border-radius:7px;font-size:0.82rem;outline:none;font-family:'Inter',sans-serif;background:white;">
+              <option value="">All Countries</option>
+              <option value="GH">🇬🇭 Ghana</option>
+              <option value="NG">🇳🇬 Nigeria</option>
+              <option value="KE">🇰🇪 Kenya</option>
+              <option value="ZA">🇿🇦 South Africa</option>
+            </select>
+          </div>
+        </div>
+
+        <button onclick="clearFilters()" style="width:100%;background:white;color:#8892A4;border:1px solid #E2E8F0;padding:0.65rem;border-radius:8px;font-size:0.82rem;cursor:pointer;font-family:'Inter',sans-serif;">Clear All Filters</button>
+      </div>
+
+      <!-- RESULTS PANEL -->
+      <div>
+        <!-- Sort + results count -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <div id="results-count" style="font-size:0.85rem;color:#8892A4;font-weight:500;"></div>
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <span style="font-size:0.78rem;color:#8892A4;">Sort by:</span>
+            <select id="sort-select" onchange="applyFilters()"
+              style="padding:0.45rem 0.8rem;border:1px solid #E2E8F0;border-radius:6px;font-size:0.82rem;outline:none;font-family:'Inter',sans-serif;background:white;">
+              <option value="relevance">Relevance</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="rating">Top Rated</option>
+              <option value="newest">Newest</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Results grid -->
+        <div id="search-results" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;"></div>
+
+        <!-- No results -->
+        <div id="no-results" style="display:none;text-align:center;padding:3rem;background:white;border-radius:12px;border:1px solid #E2E8F0;">
+          <div style="font-size:3rem;margin-bottom:1rem;">🔍</div>
+          <div style="font-weight:700;color:#0A1628;margin-bottom:0.4rem;">No products found</div>
+          <div style="font-size:0.85rem;color:#8892A4;">Try different keywords or adjust your filters</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// AUTH LOGIC
+// ============================================
+let currentUser = null;
+
+function switchAuthTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('login-form-wrap').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('signup-form-wrap').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('tab-login').style.background = isLogin ? '#0A1628' : 'transparent';
+  document.getElementById('tab-login').style.color = isLogin ? 'white' : '#8892A4';
+  document.getElementById('tab-signup').style.background = isLogin ? 'transparent' : '#0A1628';
+  document.getElementById('tab-signup').style.color = isLogin ? '#8892A4' : 'white';
+}
+
+function togglePass(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+function updateStrength(val) {
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const colors = ['#EF4444','#F59E0B','#10B981','#059669'];
+  const labels = ['Weak','Fair','Strong','Very Strong'];
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('str-' + i).style.background = i <= score ? colors[score-1] : '#E2E8F0';
+  }
+  document.getElementById('str-label').textContent = score > 0 ? labels[score-1] : '';
+  document.getElementById('str-label').style.color = score > 0 ? colors[score-1] : '#8892A4';
+}
+
+async function socialLogin(provider) {
+  const providerMap = { google: 'google', facebook: 'facebook' };
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: providerMap[provider],
+    options: { redirectTo: window.location.href }
+  });
+  if (error) alert('Login error: ' + error.message);
+}
+
+async function submitLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  if (!email || !pass) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
+  if (!email.includes('@')) { errEl.textContent = 'Please enter a valid email.'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+
+  // Show loading
+  const btn = event.target;
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+
+  btn.textContent = 'Sign In';
+  btn.disabled = false;
+
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  currentUser = { name: email.split('@')[0], email: email, id: data.user.id };
+  showLoggedIn();
+  updateNavUser();
+  loadUserOrders(data.user.id);
+}
+
+async function submitSignup() {
+  const fname = document.getElementById('signup-fname').value.trim();
+  const lname = document.getElementById('signup-lname').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass = document.getElementById('signup-pass').value;
+  const country = document.getElementById('signup-country').value;
+  const errEl = document.getElementById('signup-error');
+
+  if (!fname || !lname || !email || !pass) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display = 'block'; return; }
+  if (pass.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+
+  const btn = event.target;
+  btn.textContent = 'Creating account...';
+  btn.disabled = true;
+
+  const { data, error } = await sb.auth.signUp({ email, password: pass });
+
+  btn.textContent = 'Create Account →';
+  btn.disabled = false;
+
+  if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; return; }
+
+  // Save profile to DB
+  await sb.from('profiles').upsert({
+    id: data.user.id,
+    full_name: fname + ' ' + lname,
+    email: email,
+    country: country,
+    role: 'buyer'
+  });
+
+  currentUser = { name: fname + ' ' + lname, email: email, id: data.user.id };
+  showLoggedIn();
+  updateNavUser();
+}
+
+function showLoggedIn() {
+  document.getElementById('login-form-wrap').style.display = 'none';
+  document.getElementById('signup-form-wrap').style.display = 'none';
+  document.getElementById('logged-in-wrap').style.display = 'block';
+  document.getElementById('logged-in-name').textContent = 'Signed in as ' + currentUser.email;
+}
+
+async function logOut() {
+  await sb.auth.signOut();
+  currentUser = null;
+  document.getElementById('logged-in-wrap').style.display = 'none';
+  document.getElementById('login-form-wrap').style.display = 'block';
+  switchAuthTab('login');
+  updateNavUser();
+}
+
+function updateNavUser() {
+  const link = document.querySelector('a[onclick*="login"]');
+  if (!link) return;
+  if (currentUser) {
+    link.textContent = '👤 ' + currentUser.name.split(' ')[0];
+  } else {
+    link.textContent = 'Sign In';
+  }
+}
+
+// ============================================
+// SEARCH & FILTER LOGIC
+// ============================================
+const searchableProducts = [
+  { id:1, name:'Tecno Spark 20 Pro — 256GB', price:2450, currency:'GHS', icon:'💻', seller:'TechHub Ghana', category:'electronics', country:'GH', rating:5, reviews:312 },
+  { id:2, name:'STRVRR Classic Drop Shoulder Tee', price:180, currency:'GHS', icon:'👕', seller:'STRVRR Official', category:'fashion', country:'GH', rating:5, reviews:87 },
+  { id:3, name:'Custom MT5 Expert Advisor — SMC Strategy', price:60, currency:'USD', icon:'📊', seller:'STRVRR Dev', category:'digital', country:'GH', rating:4, reviews:44 },
+  { id:4, name:'Sony WH-1000XM5 Wireless Headphones', price:189000, currency:'NGN', icon:'🎧', seller:'AudioPro Lagos', category:'electronics', country:'NG', rating:5, reviews:208 },
+  { id:5, name:'Adidas Samba OG — Limited African Edition', price:2800, currency:'ZAR', icon:'👟', seller:'KicksCulture SA', category:'fashion', country:'ZA', rating:5, reviews:156 },
+  { id:6, name:'Logo & Brand Identity Design Package', price:35, currency:'USD', icon:'🖥️', seller:'CreativeMind Kenya', category:'digital', country:'KE', rating:5, reviews:291 },
+  { id:7, name:'Samsung Galaxy Tab S9 FE — 128GB', price:3200, currency:'GHS', icon:'📱', seller:'GadgetWorld GH', category:'electronics', country:'GH', rating:4, reviews:73 },
+  { id:8, name:'Kente Weave Bomber Jacket — Custom', price:650, currency:'GHS', icon:'🧵', seller:'AfriStyle Accra', category:'fashion', country:'GH', rating:5, reviews:129 },
+  { id:9, name:'Organic Shea Butter — 500ml', price:120, currency:'GHS', icon:'🧴', seller:'NaturalGlow GH', category:'health', country:'GH', rating:5, reviews:203 },
+  { id:10, name:'African Print Hoodie — Unisex', price:280, currency:'GHS', icon:'🧥', seller:'AfriStyle Accra', category:'fashion', country:'GH', rating:4, reviews:61 },
+  { id:11, name:'Fresh Moringa Powder — 1kg', price:95, currency:'GHS', icon:'🌿', seller:'FarmFresh GH', category:'food', country:'GH', rating:5, reviews:147 },
+  { id:12, name:'Pine Script Indicator — SMC Suite', price:45, currency:'USD', icon:'📈', seller:'STRVRR Dev', category:'digital', country:'GH', rating:5, reviews:38 },
+];
+
+let currentQuery = '';
+let filteredResults = [...searchableProducts];
+
+function runSearch(query) {
+  currentQuery = query.toLowerCase().trim();
+  applyFilters();
+}
+
+function applyFilters() {
+  const priceMax = parseFloat(document.getElementById('price-range').value);
+  const ratingMin = parseFloat(document.querySelector('input[name="rating"]:checked').value);
+  const countryVal = document.getElementById('country-filter').value;
+  const sortVal = document.getElementById('sort-select').value;
+
+  // Get checked categories
+  const catChecks = Array.from(document.querySelectorAll('#cat-filters input[type=checkbox]'));
+  const allChecked = catChecks.find(c => c.value === 'all' && c.checked);
+  const selectedCats = allChecked ? [] : catChecks.filter(c => c.checked && c.value !== 'all').map(c => c.value);
+
+  filteredResults = searchableProducts.filter(p => {
+    const matchQuery = !currentQuery || p.name.toLowerCase().includes(currentQuery) || p.seller.toLowerCase().includes(currentQuery) || p.category.toLowerCase().includes(currentQuery);
+    const matchCat = selectedCats.length === 0 || selectedCats.includes(p.category);
+    const matchPrice = p.currency === 'GHS' ? p.price <= priceMax : true;
+    const matchRating = p.rating >= ratingMin;
+    const matchCountry = !countryVal || p.country === countryVal;
+    return matchQuery && matchCat && matchPrice && matchRating && matchCountry;
+  });
+
+  // Sort
+  if (sortVal === 'price-asc') filteredResults.sort((a,b) => a.price - b.price);
+  else if (sortVal === 'price-desc') filteredResults.sort((a,b) => b.price - a.price);
+  else if (sortVal === 'rating') filteredResults.sort((a,b) => b.rating - a.rating || b.reviews - a.reviews);
+
+  renderResults();
+}
+
+function renderResults() {
+  const grid = document.getElementById('search-results');
+  const none = document.getElementById('no-results');
+  const count = document.getElementById('results-count');
+
+  count.textContent = filteredResults.length + ' product' + (filteredResults.length !== 1 ? 's' : '') + ' found' + (currentQuery ? ' for "' + currentQuery + '"' : '');
+
+  if (filteredResults.length === 0) {
+    grid.innerHTML = '';
+    none.style.display = 'block';
+    return;
+  }
+
+  none.style.display = 'none';
+  const stars = n => '★'.repeat(n) + '☆'.repeat(5-n);
+  grid.innerHTML = filteredResults.map(p => `
+    <div style="background:white;border-radius:10px;overflow:hidden;border:1px solid #E2E8F0;cursor:pointer;transition:all 0.25s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 25px rgba(0,0,0,0.1)';this.style.borderColor='#C9A84C'" onmouseout="this.style.transform='none';this.style.boxShadow='none';this.style.borderColor='#E2E8F0'">
+      <div style="background:linear-gradient(135deg,#0A1628,#1A3357);height:140px;display:flex;align-items:center;justify-content:center;font-size:3rem;" onclick="openCheckout(${p.id})">${p.icon}</div>
+      <div style="padding:0.9rem;">
+        <div style="font-size:0.68rem;color:#8892A4;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:0.2rem;">${p.category}</div>
+        <div style="font-size:0.86rem;font-weight:600;color:#0A1628;margin-bottom:0.3rem;line-height:1.3;">${p.name}</div>
+        <div style="font-size:0.73rem;color:#8892A4;margin-bottom:0.6rem;">By <span style="color:#C9A84C;font-weight:600;">${p.seller}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:1rem;font-weight:800;color:#0A1628;">${symbols[p.currency]}${p.price.toLocaleString()}</div>
+            <div style="font-size:0.7rem;color:#C9A84C;">${stars(p.rating)} <span style="color:#8892A4;">(${p.reviews})</span></div>
+          </div>
+          <div style="display:flex;gap:0.3rem;">
+            <button onclick="addToCart(${p.id})" style="background:#F1F5F9;color:#0A1628;border:none;padding:0.35rem 0.6rem;border-radius:5px;font-size:0.72rem;font-weight:600;cursor:pointer;">+Cart</button>
+            <button onclick="openCheckout(${p.id})" style="background:#C9A84C;color:#0A1628;border:none;padding:0.35rem 0.6rem;border-radius:5px;font-size:0.72rem;font-weight:600;cursor:pointer;">Buy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updatePriceLabel(val) {
+  document.getElementById('price-label').textContent = 'GHS ' + parseInt(val).toLocaleString();
+}
+
+function clearFilters() {
+  document.getElementById('price-range').value = 5000;
+  updatePriceLabel(5000);
+  document.querySelectorAll('#cat-filters input').forEach((c,i) => c.checked = i===0);
+  document.querySelector('input[name="rating"]').checked = true;
+  document.getElementById('country-filter').value = '';
+  document.getElementById('sort-select').value = 'relevance';
+  applyFilters();
+}
+
+// Initialize search page with all products
+window.addEventListener('load', function() {
+  renderResults();
+});
+</script>
+
+</body>
+</html>
